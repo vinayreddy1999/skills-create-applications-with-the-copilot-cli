@@ -19,6 +19,12 @@ try {
   assert.strictEqual(run('multiply 4 6'), '24');
   // division
   assert.strictEqual(run('divide 8 2'), '4');
+  // modulo
+  assert.strictEqual(run('mod 10 3'), '1');
+  // exponentiation
+  assert.strictEqual(run('pow 2 3'), '8');
+  // square root (unary)
+  assert.strictEqual(run('sqrt 9'), '3');
 
   console.log('All tests passed');
 } catch (err) {
