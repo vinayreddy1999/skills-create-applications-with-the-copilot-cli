@@ -1,42 +1,33 @@
 const assert = require('assert');
+const { execSync } = require('child_process');
 
-describe('Calculator', function() {
-  it('should add numbers correctly', function() {
-    assert.strictEqual(2 + 3, 5);
-    assert.strictEqual(-1 + 1, 0);
-  });
+function run(cmd) {
+  try {
+    return execSync(`node src/calculator.js ${cmd}`, { encoding: 'utf8' }).trim();
+  } catch (err) {
+    // attach stderr as string for assertions
+    err.stderrStr = err.stderr ? err.stderr.toString() : '';
+    throw err;
+  }
+}
 
-  it('should subtract numbers correctly', function() {
-    assert.strictEqual(5 - 3, 2);
-    assert.strictEqual(0 - 7, -7);
-  });
-
-  it('should multiply numbers correctly', function() {
-    assert.strictEqual(4 * 3, 12);
-    assert.strictEqual(-2 * 3, -6);
-  });
-
-  it('should divide numbers correctly', function() {
-    assert.strictEqual(10 / 2, 5);
-    assert.strictEqual(9 / 3, 3);
-  });
-
-  it('should calculate modulo correctly', function() {
-    assert.strictEqual(10 % 3, 1);
-    assert.strictEqual(8 % 2, 0);
-  });
-
-  it('should calculate power correctly', function() {
-    assert.strictEqual(Math.pow(2, 3), 8);
-    assert.strictEqual(Math.pow(5, 0), 1);
-  });
-
-  it('should calculate square root correctly', function() {
-    assert.strictEqual(Math.sqrt(9), 3);
-    assert.strictEqual(Math.sqrt(0), 0);
-  });
-
-  it('should throw error for sqrt of negative number', function() {
-    assert.ok(Number.isNaN(Math.sqrt(-1)));
+describe('Calculator CLI', function() {
+  it('adds', function() { assert.strictEqual(run('add 2 3'), '5'); });
+  it('subtracts', function() { assert.strictEqual(run('subtract 5 2'), '3'); });
+  it('multiplies', function() { assert.strictEqual(run('multiply 4 6'), '24'); });
+  it('divides', function() { assert.strictEqual(run('divide 8 2'), '4'); });
+  it('modulo', function() { assert.strictEqual(run('mod 10 3'), '1'); });
+  it('power', function() { assert.strictEqual(run('pow 2 3'), '8'); });
+  it('sqrt', function() { assert.strictEqual(run('sqrt 9'), '3'); });
+  it('sqrt negative should error', function() {
+    try {
+      run('sqrt -9');
+      throw new Error('Expected error for sqrt negative');
+    } catch (err) {
+      const stderr = err.stderrStr || err.message || '';
+      if (!/square root/i.test(stderr) && (err.status === 0 || typeof err.status === 'undefined')) {
+        throw new Error('Expected non-zero exit or square root error message');
+      }
+    }
   });
 });

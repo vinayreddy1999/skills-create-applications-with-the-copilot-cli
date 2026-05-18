@@ -1,12 +1,12 @@
 {
   "name": "skills-create-applications-with-the-copilot-cli",
   "version": "1.0.0",
-  "description": "Mocha test setup for calculator functions",
-  "main": "index.js",
+  "description": "Calculator app tests",
+  "main": "src/calculator.js",
   "scripts": {
-    "test": "mocha \"src/tests/**/*.js\""
+    "test": "mocha \"src/tests/**/*.js\" --exit"
   },
   "devDependencies": {
-    "mocha": "^11.7.5"
+    "mocha": "^10.2.0"
   }
 }
