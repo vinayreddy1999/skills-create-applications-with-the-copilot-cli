@@ -10,6 +10,11 @@
  * - exponentiation (^) : pow, ^, **
  * - square root        : sqrt (unary)
  *
+ * Exposed functions:
+ * - modulo(a, b)
+ * - power(base, exponent)
+ * - squareRoot(n)
+ *
  * Usage examples:
  *   node src/calculator.js add 2 3        # 5
  *   node src/calculator.js subtract 5 2   # 3
@@ -19,6 +24,34 @@
  *   node src/calculator.js pow 2 3        # 8
  *   node src/calculator.js sqrt 9         # 3
  */
+
+// Exportable functions
+function modulo(a, b) {
+  if (typeof a !== 'number' || typeof b !== 'number' || Number.isNaN(a) || Number.isNaN(b)) {
+    throw new TypeError('modulo: both arguments must be numbers');
+  }
+  if (b === 0) {
+    throw new RangeError('modulo by zero');
+  }
+  return a % b;
+}
+
+function power(base, exponent) {
+  if (typeof base !== 'number' || typeof exponent !== 'number' || Number.isNaN(base) || Number.isNaN(exponent)) {
+    throw new TypeError('power: both arguments must be numbers');
+  }
+  return Math.pow(base, exponent);
+}
+
+function squareRoot(n) {
+  if (typeof n !== 'number' || Number.isNaN(n)) {
+    throw new TypeError('squareRoot: argument must be a number');
+  }
+  if (n < 0) {
+    throw new RangeError('square root of negative number');
+  }
+  return Math.sqrt(n);
+}
 
 function printUsageAndExit() {
   console.error('Usage: node src/calculator.js <operation> <num1> [<num2>]');
@@ -35,16 +68,14 @@ const op = args[0].toLowerCase();
 if (op === 'sqrt') {
   if (args.length < 2) printUsageAndExit();
   const n = Number(args[1]);
-  if (Number.isNaN(n)) {
-    console.error('Error: operand must be a valid number');
+  try {
+    const res = squareRoot(n);
+    console.log(res);
+    process.exit(0);
+  } catch (err) {
+    console.error('Error:', err.message);
     process.exit(1);
   }
-  if (n < 0) {
-    console.error('Error: square root of negative number');
-    process.exit(1);
-  }
-  console.log(Math.sqrt(n));
-  process.exit(0);
 }
 
 // Binary operations
@@ -58,52 +89,52 @@ if (Number.isNaN(a) || Number.isNaN(b)) {
 }
 
 let result;
-switch (op) {
-  case 'add':
-  case '+':
-    // addition
-    result = a + b;
-    break;
-  case 'subtract':
-  case '-':
-    // subtraction
-    result = a - b;
-    break;
-  case 'multiply':
-  case 'x':
-  case '*':
-    // multiplication
-    result = a * b;
-    break;
-  case 'divide':
-  case '/':
-    // division
-    if (b === 0) {
-      console.error('Error: division by zero');
-      process.exit(1);
-    }
-    result = a / b;
-    break;
-  case 'mod':
-  case 'modulo':
-  case '%':
-    // modulo
-    if (b === 0) {
-      console.error('Error: modulo by zero');
-      process.exit(1);
-    }
-    result = a % b;
-    break;
-  case 'pow':
-  case '^':
-  case '**':
-    // exponentiation
-    result = Math.pow(a, b);
-    break;
-  default:
-    console.error(`Unknown operation: ${op}`);
-    printUsageAndExit();
+try {
+  switch (op) {
+    case 'add':
+    case '+':
+      // addition
+      result = a + b;
+      break;
+    case 'subtract':
+    case '-':
+      // subtraction
+      result = a - b;
+      break;
+    case 'multiply':
+    case 'x':
+    case '*':
+      // multiplication
+      result = a * b;
+      break;
+    case 'divide':
+    case '/':
+      // division
+      if (b === 0) throw new RangeError('division by zero');
+      result = a / b;
+      break;
+    case 'mod':
+    case 'modulo':
+    case '%':
+      // modulo
+      result = modulo(a, b);
+      break;
+    case 'pow':
+    case '^':
+    case '**':
+      // exponentiation
+      result = power(a, b);
+      break;
+    default:
+      throw new Error(`Unknown operation: ${op}`);
+  }
+} catch (err) {
+  console.error('Error:', err.message);
+  process.exit(1);
 }
 
 // Print result to stdout
 console.log(result);
+
+// Export functions for programmatic use (if required)
+module.exports = { modulo, power, squareRoot };
